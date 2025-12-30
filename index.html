@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rock Paper Scissors</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===== GLOBAL ===== */
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at center, #222 0%, transparent 60%),
+        linear-gradient(180deg, #000, #111, #222);
+      font-family: 'Fredoka', sans-serif;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* ===== START SCREEN ===== */
+    .start-screen {
+      text-align: center;
+      animation: fadeIn 1s ease;
+    }
+
+    .start-title {
+      font-size: 2.8rem;
+      color: #ffeb3b;
+      margin-bottom: 10px;
+      text-shadow: 0 0 15px rgba(255,235,59,0.6);
+    }
+
+    .start-subtitle {
+      opacity: 0.85;
+      margin-bottom: 30px;
+    }
+
+    .start-btn {
+      padding: 16px 40px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      background: #ffeb3b;
+      color: #000;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      transition: transform 0.2s ease;
+    }
+
+    .start-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* ===== GAME CONTAINER ===== */
+    .container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+
+    /* ===== CURVED TITLE ===== */
+    .title-svg {
+      width: 100%;
+      height: 120px;
+    }
+
+    .title-svg text {
+      font-size: 42px;
+      font-weight: 900;
+      fill: #ffeb3b;
+      filter:
+        drop-shadow(0 3px 0 rgba(0,0,0,0.7))
+        drop-shadow(0 6px 15px rgba(0,0,0,0.8));
+    }
+
+    /* ===== BUTTONS ===== */
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+    }
+
+    .btn {
+      width: 110px;
+      height: 110px;
+      background: #111;
+      border-radius: 16px;
+      border: 2px solid #333;
+      color: #ffeb3b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    }
+
+    .btn:hover {
+      transform: translateY(-4px);
+      border-color: #ffeb3b;
+    }
+
+    .btn span {
+      display: block;
+      font-size: 2.2rem;
+      margin-bottom: 6px;
+    }
+
+    /* ===== RESULT ===== */
+    .result {
+      font-size: 1.8rem;
+      margin: 20px 0;
+    }
+
+    .win {
+      color: #ffeb3b;
+      text-shadow: 0 0 15px rgba(255,235,59,0.8);
+      animation: pop 0.3s ease;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.85); }
+      to { transform: scale(1); }
+    }
+
+    /* ===== INFO ===== */
+    .info {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    /* ===== SCORE BOX ===== */
+    .score-box {
+      background: rgba(0,0,0,0.7);
+      border-radius: 14px;
+      padding: 15px;
+      margin-top: 15px;
+    }
+
+    /* ===== CONFETTI ===== */
+    #confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 8px;
+      height: 14px;
+      animation: fall 3s linear forwards;
+    }
+
+    @keyframes fall {
+      from { transform: translateY(-10vh) rotate(0deg); }
+      to { transform: translateY(110vh) rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="confetti-container"></div>
+
+<!-- ===== START SCREEN ===== -->
+<div id="startScreen" class="start-screen">
+  <div class="start-title">Rock Paper Scissors</div>
+  <div class="start-subtitle">Beat the computer if you can 😎</div>
+  <button class="start-btn" onclick="startGame()">Start Game</button>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="gameScreen" class="container hidden">
+
+  <svg class="title-svg" viewBox="0 0 400 120">
+    <defs>
+      <path id="curve" d="M 20 90 Q 200 10 380 90" />
+    </defs>
+    <text text-anchor="middle">
+      <textPath href="#curve" startOffset="50%">
+        Rock Paper Scissors
+      </textPath>
+    </text>
+  </svg>
+
+  <div class="info">Choose one below</div>
+
+  <div class="buttons">
+    <button class="btn" onclick="play('rock')"><span>🪨</span>Rock</button>
+    <button class="btn" onclick="play('paper')"><span>📄</span>Paper</button>
+    <button class="btn" onclick="play('scissors')"><span>✂️</span>Scissors</button>
+  </div>
+
+  <div id="result" class="result">Make your move</div>
+
+  <div class="info">
+    Player: <span id="playerChoice">-</span><br>
+    Computer: <span id="computerChoice">-</span>
+  </div>
+
+  <div class="score-box">
+    Win: <span id="win">0</span><br>
+    Draw: <span id="draw">0</span><br>
+    Lose: <span id="lose">0</span>
+  </div>
+
+</div>
+
+<script>
+  let win = 0, lose = 0, draw = 0;
+
+  function startGame() {
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('gameScreen').classList.remove('hidden');
+  }
+
+  function play(player) {
+    const choices = ['rock', 'paper', 'scissors'];
+    const computer = choices[Math.floor(Math.random() * 3)];
+
+    playerChoice.textContent = player;
+    computerChoice.textContent = computer;
+
+    result.className = 'result';
+
+    if (player === computer) {
+      result.textContent = "It's a Draw 😐";
+      draw++;
+    } else if (
+      (player === 'rock' && computer === 'scissors') ||
+      (player === 'paper' && computer === 'rock') ||
+      (player === 'scissors' && computer === 'paper')
+    ) {
+      result.textContent = "You Won! 🎉";
+      result.classList.add('win');
+      win++;
+      confetti();
+    } else {
+      result.textContent = "You Lost 😢";
+      lose++;
+    }
+
+    document.getElementById('win').textContent = win;
+    document.getElementById('draw').textContent = draw;
+    document.getElementById('lose').textContent = lose;
+  }
+
+  function confetti() {
+    const container = document.getElementById('confetti-container');
+    container.innerHTML = '';
+    const colors = ['#ffeb3b', '#ff9800', '#4fc3f7', '#66bb6a'];
+
+    for (let i = 0; i < 80; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      c.style.animationDuration = (Math.random() * 2 + 2) + 's';
+      container.appendChild(c);
+    }
+
+    setTimeout(() => container.innerHTML = '', 3500);
+  }
+</script>
+
+</body>
+</html>
